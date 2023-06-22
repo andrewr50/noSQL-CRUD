@@ -8,7 +8,8 @@ const genreSchema = new mongoose.Schema({
   reactionBody: { 
 		type: String,
 		required: true,
-
+    minLength: 1,
+    maxLength: 280,
 	},
 	username: {
 		type: String,
@@ -22,7 +23,5 @@ const genreSchema = new mongoose.Schema({
 });
 
 const Genre = mongoose.model('Genre', genreSchema);
-
-const handleError = (err) => console.error(err);
 
 module.exports = Genre;

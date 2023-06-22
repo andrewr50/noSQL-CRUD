@@ -24,7 +24,8 @@ const thoughtSchema = new mongoose.Schema({
     reactionBody: {
       type: String,
       required: true,
-      // maximum character count
+      minLength: 1,
+      maxLength: 280,
     },
     username: {
       type: String,
@@ -42,7 +43,5 @@ function getDate() {
 }
 
 const Thought = mongoose.model('thought', thoughtSchema);
-
-const handleError = (err) => console.error(err);
 
 module.exports = Thought;
