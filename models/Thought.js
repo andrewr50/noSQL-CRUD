@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const reactionSchema = require('./Reaction');
 
 const thoughtSchema = new mongoose.Schema({
   thoughtText: { 
@@ -12,7 +13,7 @@ const thoughtSchema = new mongoose.Schema({
   createdAt: { 
 		type: Date, 
 		default: Date.now, 
-		unique:true, 
+		
 	},
   username: {
     type: String,
@@ -20,27 +21,6 @@ const thoughtSchema = new mongoose.Schema({
   },
   reactions: 
     [reactionSchema],
-});
-
-const reactionSchema = new mongoose.Schema({
-  reactionId: {
-    type: mongoose.Types.ObjectId,
-    default: new mongoose.Types.ObjectId,
-  },
-  reactionBody: {
-    type: String,
-    required: true,
-    minLength: 1,
-    maxLength: 280,
-  },
-  username: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date(),  
-  },
 });
 
 thoughtSchema.virtual('reactionCount').get(function() {

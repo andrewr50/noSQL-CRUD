@@ -43,7 +43,9 @@ app.get('/users', async (req, res) => {
 // Finds user by id
 app.get('/users/:id', async (req, res) => {
   try {
-    const result = await User.findOne({ _id: req.params.id });
+    const result = await User.findOne({ _id: req.params.id })
+      .populate('thoughts')
+      .populate('friends');
     res.status(200).json(result);
   } catch (err) {
     console.log('Uh Oh, something went wrong');
