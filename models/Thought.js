@@ -43,9 +43,9 @@ const reactionSchema = new mongoose.Schema({
   },
 });
 
-function getDate() {
-
-}
+thoughtSchema.virtual('reactionCount').get(function() {
+  return this.reactions.length;
+});
 
 const Thought = mongoose.model('thought', thoughtSchema);
 
