@@ -1,8 +1,6 @@
 const express = require('express');
 const db = require('./config/connection');
-
-// Require model
-const { User, Thought, } = require('./models');
+const { User, Thought } = require('./models');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -28,7 +26,7 @@ app.post('/users', (req, res) => {
   }
 });
 
-// Finds all user
+// Finds all users
 app.get('/users', async (req, res) => {
   try {
     // Using model in route to find all documents that are instances of that model
@@ -44,8 +42,8 @@ app.get('/users', async (req, res) => {
 app.get('/users/:id', async (req, res) => {
   try {
     const result = await User.findOne({ _id: req.params.id })
-      .populate('thoughts')
-      .populate('friends');
+      .populate('thoughts') // Populate the thoughts array with created Thoughts
+      .populate('friends'); // Populate the friends array with friend ObjectId's
     res.status(200).json(result);
   } catch (err) {
     console.log('Uh Oh, something went wrong');
@@ -74,7 +72,7 @@ app.put('/users/:id', async (req, res) => {
 // Finds user by id and deletes
 app.delete('/users/:id', async (req, res) => {
   try {
-    const result = await User.findOneAndDelete({ name: req.params.id });
+    const result = await User.findOneAndDelete({ _id: req.params.id });
     res.status(200).json(result);
     console.log(`Deleted: ${result}`);
   } catch (err) {
@@ -83,28 +81,73 @@ app.delete('/users/:id', async (req, res) => {
   }
 });
 
+//------------------------------Friends--------------------------------------------
+
+app.put('api/users/:userId/friends/:friendId', async (req, res) => {
+  try {
+    const result = 
+      await User.findOneAndUpdate(
+        { _id: req.params.userId },
+        { $push: {friends: req.params.friendId}},
+        { new: true }, // Returns updated document
+      );
+
+    if (!result) {
+      return res.status(404).json({ message: 'No user with that Id' })
+    }
+  } catch (error) {
+    console.log('Something went wrong');
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+});
+
+app.put('api/users/:userId/friends/:id', async (req, res) => {
+  try {
+    User.findOneAndDelete(
+      { _id: req.params.userId },
+      { $pull: {friends: req.params.friendId}},
+      { new: true }, // Returns updated document
+    );
+
+    if (!result) {
+      return res.status(404).json({ message: 'No user with that Id' })
+    }
+
+  } catch (error) {
+        console.log('Something went wrong');
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+});
+
 //------------Thoughts---------------------------------------------------
 
 // Creates a new thought
-app.post('/thoughts', (req, res) => {
-  const newThought = 
-    new Thought({ 
-      thoughtText: req.body.thoughtText,
-      username: req.body.username,
-    });
-  newThought.save();
-  if (newThought) {
-    res.status(200).json(newThought);
-  } else {
-    console.log('Uh Oh, something went wrong');
-    res.status(500).json({ message: 'something went wrong' });
+app.post('/thoughts', async (req, res) => {
+  try {
+    const newThought = await Thought.create(req.body);
+    //Update the thoughts array of the User that creates the Thought to link them
+    const userData = await User.findOneAndUpdate(
+      { _id: req.body.userId },
+      { $push: {thoughts: newThought._id}},
+      { new: true }, // Returns updated document
+    )
+    
+    if (!userData) {
+      return res.status(404).json({message: "User not found"})
+    }
+
+    if (newThought) {
+      res.status(200).json(newThought);
+    }
+  } catch {
+    console.log('Something went wrong');
+    res.status(500).json({ message: 'Something went wrong' });
   }
 });
 
 // Finds all thoughts
 app.get('/thoughts', async (req, res) => {
   try {
-    // Using model in route to find all documents that are instances of that model
     const result = await Thought.find({});
     res.status(200).json(result);
   } catch (err) {
@@ -113,21 +156,24 @@ app.get('/thoughts', async (req, res) => {
   }
 });
 
-// Finds document by id 
+// Finds Thought by id 
 app.get('/thoughts/:id', async (req, res) => {
   try {
-    const result = await Thought.findOne({ _id: req.params._id });
+    const result = await Thought.findOne({ _id: req.params.id });
+    if (!result) {
+      return res.status(404).json({message: 'Thought not found with this id'});
+    }
     res.status(200).json(result);
   } catch (err) {
-    console.log('Uh Oh, something went wrong');
-    res.status(500).json({ message: 'something went wrong' });
+    console.log('Something went wrong');
+    res.status(500).json({ message: 'Something went wrong' });
   }
 });
 
 // Finds thought by id and deletes
 app.delete('/thoughts/:id', async (req, res) => {
   try {
-    const result = await Thought.findOneAndDelete({ name: req.params._id });
+    const result = await Thought.findOneAndDelete({ _id: req.params.id });
     res.status(200).json(result);
     console.log(`Deleted: ${result}`);
   } catch (err) {
@@ -136,13 +182,14 @@ app.delete('/thoughts/:id', async (req, res) => {
   }
 });
 
+// Finds Thought by id and updates
 app.put('/thoughts:id', async (req, res) => {
   try {
     const result = await Thought
       .findOneAndUpdate(
-        { name: req.params._id }, // Finds doc with id
-        { name: req.params.name }, // Updates name
-        { email: req.params.email}, // Updates email
+        { name: req.params.id }, // Finds Thought by id
+        { name: req.body.name }, // Updates name
+        { email: req.body.email}, // Updates email
         { new: true } // Returns updated document
       );
     res.status(200).json(result);
@@ -176,8 +223,8 @@ app.delete('/reactions:id', async (req, res) => {
     res.status(200).json(result);
     console.log(`Deleted: ${result}`);
   } catch (err) {
-    console.log('Uh Oh, something went wrong');
-    res.status(500).json({ message: 'something went wrong' });
+    console.log('Something went wrong');
+    res.status(500).json({ message: 'Something went wrong' });
   }
 });
 
