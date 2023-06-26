@@ -84,7 +84,35 @@ const thoughtController = {
       console.log('Something went wrong');
       res.status(500).json({ message: 'Something went wrong' });
     }
+  },
+
+  //-------------------------------Reactions-------------------------------//
+
+  // Creates a new reaction
+  createReaction (req, res) {
+    const newReaction = new ({ 
+      name: req.params.user 
+    });
+    newReaction.save();
+    if (newReaction) {
+      res.status(200).json(newReaction);
+    } else {
+      console.log('Uh Oh, something went wrong');
+      res.status(500).json({ message: 'something went wrong' });
+    }
+  },
+
+  // Finds matching id and deletes
+  async deleteReaction(req, res) {
+    try {
+      const result = await Thought.findOneAndDelete({ name: req.params.reactions.reactionId});
+      res.status(200).json(result);
+      console.log(`Deleted: ${result}`);
+    } catch (err) {
+      console.log('Something went wrong');
+      res.status(500).json({ message: 'Something went wrong' });
+    }
   }
-}
+};
 
 module.exports = thoughtController;
