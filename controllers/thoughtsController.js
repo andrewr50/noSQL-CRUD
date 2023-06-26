@@ -1,4 +1,5 @@
-const { User, Thought } = require('../models')
+const { User, Thought } = require('../models');
+const { findByIdAndUpdate } = require('../models/Thought');
 
 const thoughtController = {
   // Creates a new thought
@@ -37,9 +38,9 @@ const thoughtController = {
   },
 
   // Finds Thought by id 
-  async findOneThought(req, res) {
+  async getOneThought(req, res) {
     try {
-      const result = await Thought.findOne({ _id: req.params.id });
+      const result = await Thought.findOne({ _id: req.params.thoughtId });
 
       if (!result) {
         return res.status(404).json({message: 'No Thought with this id'});
@@ -54,7 +55,7 @@ const thoughtController = {
   // Finds thought by id and deletes
   async deleteThought(req, res) {
     try {
-      const result = await Thought.findOneAndDelete({ _id: req.params.id });
+      const result = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
       res.status(200).json(result);
 
       if (!result) {
@@ -73,7 +74,7 @@ const thoughtController = {
     try {
       const result = await Thought
         .findOneAndUpdate(
-          { name: req.params.id }, // Finds Thought by id
+          { name: req.params.thoughtId }, // Finds Thought by id
           { name: req.body.name }, // Updates name
           { email: req.body.email}, // Updates email
           { new: true } // Returns updated document
@@ -89,23 +90,33 @@ const thoughtController = {
   //-------------------------------Reactions-------------------------------//
 
   // Creates a new reaction
-  createReaction (req, res) {
-    const newReaction = new ({ 
-      name: req.params.user 
-    });
-    newReaction.save();
-    if (newReaction) {
-      res.status(200).json(newReaction);
-    } else {
-      console.log('Uh Oh, something went wrong');
-      res.status(500).json({ message: 'something went wrong' });
+  async createReaction (req, res) {
+    try{
+      const thoughtData = findByIdAndUpdate(
+        { _id: req.params.thoughtId },
+        { $push: { reactions: req.body } },
+        { new: true },
+        );
+      newReaction.save();
+
+      if (!thoughtData) {
+        return res.status(404).json({ message: 'No Thought with this id' });
+      }
+      res.status(200).json(thoughtData);
+    } catch {
+      console.log('Something went wrong');
+      res.status(500).json({ message: 'Something went wrong' });
     }
   },
 
   // Finds matching id and deletes
   async deleteReaction(req, res) {
     try {
-      const result = await Thought.findOneAndDelete({ name: req.params.reactions.reactionId});
+      const result = await Thought.findOneAndUpdate(
+        { _id: req.params.thoughtId},
+        { $pull: { reactions: { reactionId: req.params.reactionId } } },
+        { new: true },
+        );
       res.status(200).json(result);
       console.log(`Deleted: ${result}`);
     } catch (err) {
