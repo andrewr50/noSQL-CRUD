@@ -1,5 +1,4 @@
 const { User, Thought } = require('../models');
-const { findByIdAndUpdate } = require('../models/Thought');
 
 const thoughtController = {
   // Creates a new thought
