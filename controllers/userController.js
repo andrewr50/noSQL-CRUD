@@ -32,7 +32,7 @@ const userController = {
   // Finds user by id
   async getOneUser(req, res) {
     try {
-      const result = await User.findOne({ _id: req.params.id })
+      const result = await User.findOne({ _id: req.params.userId })
         .populate('thoughts') // Populate the thoughts array with created Thoughts
         .populate('friends'); // Populate the friends array with friend ObjectId's
       res.status(200).json(result);
