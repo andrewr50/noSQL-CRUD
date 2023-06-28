@@ -91,7 +91,7 @@ const thoughtController = {
   // Creates a new reaction
   async createReaction (req, res) {
     try{
-      const thoughtData = findByIdAndUpdate(
+      const thoughtData = await Thought.findOneAndUpdate(
         { _id: req.params.thoughtId },
         { $push: { reactions: req.body } },
         { new: true },
