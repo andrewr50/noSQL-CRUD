@@ -1,8 +1,8 @@
-### noSQL-CRUD
-Create a simple SVG logo for web use by following the prompts. An SVG file will be created quickly and ready for use.
+# noSQL-CRUD
+This repository contains a backend for a social media site using MongoDB.
 
-## Description
-This program creates simple SVG logos based on prompts for text, text color, background shape, and background color.
+# Description
+This is a noSQL social media backend using MongoDB. It contains CRUD functions for Users, Thoughts, and Reactions to Thoughts.
 
 # Installing
 First we need to install our dependencies. We will start with node.js by entering npm i into the terminal.
