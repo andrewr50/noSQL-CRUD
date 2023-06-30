@@ -103,7 +103,7 @@ const userController = {
           { new: true }, // Returns updated document
         );
 
-      res.status(200).json();
+      res.status(200).json(result);
 
       if (!result) {
         return res.status(404).json({ message: 'No user with that Id' })

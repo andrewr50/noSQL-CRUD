@@ -54,14 +54,18 @@ const thoughtController = {
   // Finds thought by id and deletes
   async deleteThought(req, res) {
     try {
-      const result = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
-      res.status(200).json(result);
 
-      if (!result) {
-        res.status(404).json({ message: 'No Thought with this id'})
-      } else {
-      console.log(`Deleted: ${result}`);
-      }
+      const result = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
+      res.json(result);
+
+
+      const userData = 
+        await User.findOneAndUpdate(
+          { thoughts: req.params.thoughtId },
+          { $pull: { thoughts: req.params.thoughtId } },
+          { new: true }
+        );
+
     } catch (err) {
       console.log('Something went wrong');
       res.status(500).json({ message: 'Something went wrong' });
