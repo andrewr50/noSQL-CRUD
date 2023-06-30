@@ -78,7 +78,7 @@ const thoughtController = {
       const result = await Thought
         .findOneAndUpdate(
           { _id: req.params.thoughtId }, // Finds Thought by id
-          { thoughtText: req.body.name }, // Updates thoughtText
+          { thoughtText: req.body.thoughtText }, // Updates thoughtText
           { new: true } // Returns updated document
         );
       res.status(200).json(result);
