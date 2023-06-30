@@ -8,7 +8,7 @@ const thoughtController = {
       //Update the thoughts array of the User that created the Thought to link them
       const userData = await User.findOneAndUpdate(
         { _id: req.body.userId },
-        { $push: {thoughts: newThought._id}},
+        { $push: { thoughts: newThought._id }},
         { new: true }, // Returns updated document
       )
       
@@ -73,9 +73,8 @@ const thoughtController = {
     try {
       const result = await Thought
         .findOneAndUpdate(
-          { name: req.params.thoughtId }, // Finds Thought by id
-          { name: req.body.name }, // Updates name
-          { email: req.body.email}, // Updates email
+          { _id: req.params.thoughtId }, // Finds Thought by id
+          { thoughtText: req.body.name }, // Updates thoughtText
           { new: true } // Returns updated document
         );
       res.status(200).json(result);

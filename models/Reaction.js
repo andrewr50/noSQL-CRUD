@@ -19,6 +19,9 @@ const reactionSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,  
   },
+},
+{
+  id: false,
 });
 
 module.exports = reactionSchema;

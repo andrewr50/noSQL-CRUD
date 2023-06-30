@@ -12,20 +12,19 @@ const userController = {
     if (newUser) {
       res.status(200).json(newUser);
     } else {
-      console.log('Something went wrong');
-      res.status(500).json({ message: 'Something went wrong' });
+      console.log(error);
+      res.status(500).json(error);
     }
   },
 
   // Finds all users
   async getUsers(req, res) {
     try {
-      // Using model in route to find all documents that are instances of that model
       const result = await User.find({});
       res.status(200).json(result);
-    } catch (err) {
-      console.log('Uh Oh, something went wrong');
-      res.status(500).json({ message: 'something went wrong' });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json(error);
     }
   },
 
@@ -36,9 +35,9 @@ const userController = {
         .populate('thoughts') // Populate the thoughts array with created Thoughts
         .populate('friends'); // Populate the friends array with friend ObjectId's
       res.status(200).json(result);
-    } catch (err) {
-      console.log('Uh Oh, something went wrong');
-      res.status(500).json({ message: 'something went wrong' });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json(error);
     }
   },
 
@@ -47,28 +46,29 @@ const userController = {
     try {
       const result = await User
         .findOneAndUpdate(
-          { name: req.params._id }, // Finds doc with id
-          { name: req.params.name }, // Updates name
-          { email: req.params.email}, // Updates email
+          { _id: req.params.userId }, // Finds doc with id
+          {
+            $set: req.body,
+          }, // Updates email
           { new: true } // Returns updated document
         );
       res.status(200).json(result);
       console.log(`Updated: ${result}`);
-    } catch (err) {
-      console.log('Uh Oh, something went wrong');
-      res.status(500).json({ message: 'something went wrong' });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json(error);
     }
   },
 
   // Finds user by id and deletes
   async deleteUser(req, res) {
     try {
-      const result = await User.findOneAndDelete({ _id: req.params.id });
+      const result = await User.findOneAndDelete({ _id: req.params.userId });
       res.status(200).json(result);
       console.log(`Deleted: ${result}`);
-    } catch (err) {
-      console.log('Uh Oh, something went wrong');
-      res.status(500).json({ message: 'something went wrong' });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json(error);
     }
   },
 
@@ -78,35 +78,40 @@ const userController = {
       const result = 
         await User.findOneAndUpdate(
           { _id: req.params.userId },
-          { $push: {friends: req.params.friendId}},
+          { $addToSet: { friends: req.params.friendId } },
           { new: true }, // Returns updated document
         );
-
+      
+      res.status(200).json(result);
+      
       if (!result) {
         return res.status(404).json({ message: 'No user with that Id' })
       }
     } catch (error) {
-      console.log('Something went wrong');
-      res.status(500).json({ message: 'Something went wrong' });
+      console.log(error);
+      res.status(500).json(error);
     }
   },
 
   // Delete from User's friends list by id
-  deleteFriend (req, res) {
+  async deleteFriend (req, res) {
     try {
-      User.findOneAndUpdate(
-        { _id: req.params.userId },
-        { $pull: {friends: req.params.friendId}},
-        { new: true }, // Returns updated document
-      );
+      const result = 
+        await User.findOneAndUpdate(
+          { _id: req.params.userId },
+          { $pull: { friends: req.params.friendId } },
+          { new: true }, // Returns updated document
+        );
+
+      res.status(200).json();
 
       if (!result) {
         return res.status(404).json({ message: 'No user with that Id' })
       }
 
     } catch (error) {
-          console.log('Something went wrong');
-      res.status(500).json({ message: 'Something went wrong' });
+      console.log(error);
+      res.status(500).json(error);
     }
   }
 };
