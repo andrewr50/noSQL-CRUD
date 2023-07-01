@@ -13,7 +13,7 @@ First we need to install our dependencies. We will start by entering `npm i` int
 There is no front end to this application. Use insomnia to test the routes.
 
 The below video is a walkthrough of how to use Insomnia with the routes:
-https://drive.google.com/file/d/1z54uaQ0NVkG0DtVtwhn6UeMOfcoRiKzh/view
+https://drive.google.com/file/d/1GoUyyrmFfIgLe7h26-YvZJyb2gSdumrY/view
 
 ## Credits
 
